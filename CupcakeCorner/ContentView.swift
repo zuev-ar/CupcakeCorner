@@ -37,16 +37,36 @@ class User: ObservableObject, Codable {
 
 struct ContentView: View {
     @State private var results = [Result]()
+    @State private var username = ""
+    @State private var email = ""
+    
+    var disableForm: Bool {
+        username.count > 5 || email.count < 5
+    }
     
     var body: some View {
-        List(results, id: \.trackId) { item in
-            VStack(alignment: .leading) {
-                Text(item.trackName)
-                    .font(.headline)
-                Text(item.collectionName)
+//        List(results, id: \.trackId) { item in
+//            VStack(alignment: .leading) {
+//                Text(item.trackName)
+//                    .font(.headline)
+//                Text(item.collectionName)
+//            }
+//        }
+//        .onAppear(perform: loadData)
+        Form {
+            Section {
+                TextField("Username", text: $username)
+                TextField("Email", text: $email)
             }
+            
+            Section {
+                Button("Create account") {
+                    print("Creating account...")
+                }
+            }
+            .disabled(username.isEmpty || email.isEmpty)
+//            .disabled(disableForm)
         }
-        .onAppear(perform: loadData)
     }
     
     func loadData() {
