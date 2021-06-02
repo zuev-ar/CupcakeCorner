@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-class Order: ObservableObject {
-    static let type = ["Vanilla", "Strawberry", "Chocolate", "Rainbow"]
+class Order: ObservableObject, Codable {
+    static let types = ["Vanilla", "Strawberry", "Chocolate", "Rainbow"]
     
     enum CodingKyes: CodingKey {
         case type
