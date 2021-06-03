@@ -10,6 +10,7 @@ import SwiftUI
 struct CheckoutView: View {
     @ObservedObject var order: Order
     
+    @State private var titleConfirmationMessage = ""
     @State private var confirmationMessage = ""
     @State private var showingConfiguration = false
     
@@ -33,13 +34,17 @@ struct CheckoutView: View {
             .navigationBarTitle("Check out", displayMode: .inline)
         }
         .alert(isPresented: $showingConfiguration) {
-            Alert(title: Text("Thank you!"), message: Text(confirmationMessage), dismissButton: .default(Text("OK")))
+            Alert(
+                title: Text(self.titleConfirmationMessage),
+                message: Text(confirmationMessage),
+                dismissButton: .default(Text("OK"))
+            )
         }
     }
     
     func placeOrder() {
         guard let encoded = try? JSONEncoder().encode(order) else {
-            print("Failed to encode order")
+            setConfirmationMessage(title: "Error", message: "Failed to encode order")
             return
         }
         
@@ -51,17 +56,22 @@ struct CheckoutView: View {
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data else {
-                print("No data in response: \(error?.localizedDescription ?? "Unknown error")")
+                setConfirmationMessage(title: "Error", message: "No data in response: \(error?.localizedDescription ?? "Unknown error")")
                 return
             }
             
             if let decoderOrder = try? JSONDecoder().decode(Order.self, from: data) {
-                self.confirmationMessage = "Your order for \(decoderOrder.quantity)x \(Order.types[decoderOrder.type].lowercased()) cupcakes is on its way!"
-                self.showingConfiguration = true
+                setConfirmationMessage(title: "Thank you!", message: "Your order for \(decoderOrder.quantity)x \(Order.types[decoderOrder.type].lowercased()) cupcakes is on its way!")
             } else {
-                print("Invalid responce from server")
+                setConfirmationMessage(title: "Error", message: "Invalid responce from server")
             }
         }.resume()
+    }
+    
+    func setConfirmationMessage(title: String, message: String) {
+        self.titleConfirmationMessage = title
+        self.confirmationMessage = message
+        self.showingConfiguration = true
     }
 }
 

@@ -41,7 +41,7 @@ class Order: ObservableObject, Codable {
     @Published var zip = ""
     
     var hasValidAddress: Bool {
-        if name.isEmpty || streetAddress.isEmpty || city.isEmpty || zip.isEmpty {
+        if name.isBlank || streetAddress.isBlank || city.isBlank || zip.isBlank {
             return false
         }
         return true
@@ -93,5 +93,11 @@ class Order: ObservableObject, Codable {
         streetAddress = try container.decode(String.self, forKey: .streetAddress)
         city = try container.decode(String.self, forKey: .city)
         zip = try container.decode(String.self, forKey: .zip)
+    }
+}
+
+extension String {
+    var isBlank: Bool {
+        return self.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
